@@ -1,21 +1,33 @@
+
 {
-  "name": "practica04_230496",
+  "name": "mx.edu.utxj.ti.awis4.230496.practica04",
   "version": "1.0.0",
-  "description": "Realizar un ejemplo de aplicacion web basada en el TechStack de NodeJS, Express que permite conectar las sesiones",
+  "description": "Sesiones HTTP, con uso de variables de Sesión.",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node app.js"
   },
-  "keywords": [],
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Edgar-Cbr/Practica04_230496.git"
+  },
+  "author": "Edgar Cabrera Velazquez",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Edgar-Cbr/Practica04_230496/issues"
+  },
+  "homepage": "https://github.com/Edgar-Cbr/Practica04_230496#readme",
   "dependencies": {
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "macaddress": "^0.5.3",
     "moment-timezone": "^0.5.46",
+    "mongoose": "^8.10.0",
+    "node-forge": "^1.3.1",
     "uuid": "^11.0.5"
   },
   "devDependencies": {
