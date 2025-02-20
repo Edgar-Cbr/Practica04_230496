@@ -55,15 +55,18 @@ const getLocal = () => {
 };
 
 const getMac = () => {
-  return new Promise((resolve, reject) => {
-      macaddress.one((err, mac) => {
-          if (err) {
-              reject(err);
-          }
-          resolve(mac);
-      });
-  });
-};
+    return new Promise((resolve, reject) => {
+        macaddress.one((err, mac) => {
+            if (err) {
+                console.error("Error al obtener la dirección MAC:", err);
+                reject(err);
+            } else {
+                resolve(mac);
+            }
+        });
+    });
+  };
+  
 
 const getClientIp = (req) => {
   const forwarded = req.headers['x-forwarded-for'];
@@ -80,52 +83,57 @@ return res.status(200).json({
 
 // Endpoint de logueo
 app.post('/login', async (req, res) => {
-try {
-    const { email, nickname, macAddress } = req.body;
+    try {
+        const { email, nickname, macAddress } = req.body;
 
-    if (!email || !nickname || !macAddress) {
-        return res.status(400).json({ message: 'Se esperan campos requeridos' });
+        if (!email || !nickname || !macAddress) {
+            return res.status(400).json({ message: 'Se esperan campos requeridos' });
+        }
+
+        const sessionId = uuidv4();
+        const createdAt_CDMX = moment().tz('America/Mexico_City').format('YYYY-MM-DD HH:mm:ss');
+
+        // Obtener datos del servidor
+        const serverIpValue = getLocal() || '';  // IP del servidor
+        const serverMacValue = await getMac();  // MAC del servidor
+        const clientIpValue = getClientIp(req); // IP del cliente
+
+        // Verificar que se obtuvieron todos los datos
+        console.log("Server IP:", serverIpValue);
+        console.log("Server MAC:", serverMacValue);
+        console.log("Client IP:", clientIpValue);
+
+        if (!serverIpValue || !serverMacValue || !clientIpValue || !macAddress) {
+            return res.status(500).json({ message: 'Error al obtener datos del servidor' });
+        }
+
+        const sessionData = new Session({
+            sessionId,
+            email,
+            nickname,
+            clientData: {
+                macAddress, // Asegúrate de pasar el macAddress recibido en la solicitud
+                clientIp: clientIpValue, // IP del cliente
+            },
+            serverData: {
+                serverIp: serverIpValue, // IP del servidor
+                serverMac: serverMacValue, // MAC del servidor
+            },
+            createdAt: createdAt_CDMX,
+            lastAccesed: createdAt_CDMX,
+            status: "Activa"
+        });
+
+        await sessionData.save();
+        req.session.sessionId = sessionId;
+
+        res.status(200).json({ message: 'Se ha logueado de manera exitosa', sessionId });
+    } catch (error) {
+        console.error("Error during login:", error);
+        res.status(500).json({ message: 'Error interno del servidor' });
     }
-
-    const sessionId = uuidv4();
-    const createdAt_CDMX = moment().tz('America/Mexico_City').format('YYYY-MM-DD HH:mm:ss');
-
-    // Obtener datos del servidor
-    const serverIpValue = getLocal() || '';  // IP del servidor
-    const serverMacValue = await getMac();  // MAC del servidor
-    const clientIpValue = getClientIp(req); // IP del cliente
-
-    // Verificar que se obtuvieron todos los datos
-    if (!serverIpValue || !serverMacValue || !clientIpValue) {
-        return res.status(500).json({ message: 'Error al obtener datos del servidor' });
-    }
-
-    const sessionData = new Session({
-        sessionId,
-        email,
-        nickname,
-        clientData: {
-          macAddress,
-          clientIp: clientIpValue,
-        },
-        serverData: {
-          serverIp: serverIpValue,
-          serverMac: serverMacValue,
-        },
-        createdAt: createdAt_CDMX,
-        lastAccesed: createdAt_CDMX,
-        status: "Activa"
-    });
-
-    await sessionData.save();
-    req.session.sessionId = sessionId;
-
-    res.status(200).json({ message: 'Se ha logueado de manera exitosa', sessionId });
-} catch (error) {
-    console.error("Error during login:", error);
-    res.status(500).json({ message: 'Error interno del servidor' });
-}
 });
+
 
 // Endpoint para actualizar la sesión
 app.post('/update', async (req, res) => {
