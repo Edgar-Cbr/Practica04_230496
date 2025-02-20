@@ -1,4 +1,3 @@
-
 {
   "name": "mx.edu.utxj.ti.awis4.230496.practica04",
   "version": "1.0.0",
@@ -22,6 +21,7 @@
   "dependencies": {
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "macaddress": "^0.5.3",
