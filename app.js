@@ -132,6 +132,9 @@ app.post('/login', async (req, res) => {
         console.error("Error during login:", error);
         res.status(500).json({ message: 'Error interno del servidor' });
     }
+    console.log("Session ID generado:", sessionId);
+    console.log("Sesión guardada:", req.session);
+
 });
 
 
@@ -194,6 +197,10 @@ res.status(200).json({
     inactividad: `${inactividadMinutos} minutos ${inactividadRestantes} segundos`,
     duracion: `${duracionMinutos} minutos ${duracionRestantes} segundos`
 });
+console.log("Session ID recibido:", sessionId);
+const session = await Session.findOne({ sessionId });
+console.log("Sesión encontrada:", session);
+
 });
 
 
